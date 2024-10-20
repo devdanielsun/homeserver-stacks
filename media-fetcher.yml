@@ -9,7 +9,7 @@ services:
       - CONNECT=Netherlands
       - TECHNOLOGY=NordLynx
       - NETWORK=10.0.0.0/24
-      - TOKEN=e9f2ab0f86b05868fe715611859658df5aa437b5d41276370c32890885fb6442
+      - TOKEN=*insert nordvpn token*
     sysctls:
       - net.ipv6.conf.all.disable_ipv6=1  # Recomended if using ipv4 only
     ports:
