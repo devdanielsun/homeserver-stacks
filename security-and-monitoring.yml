@@ -1,0 +1,69 @@
+services:
+  adguardhome:
+    container_name: adguardhome
+    image: adguard/adguardhome
+    ports:
+      - 3000:3000/tcp
+      - 443:443/tcp
+      - 53:53/tcp
+      - 53:53/udp
+      - 67:67/udp
+      - 68:68/tcp
+      - 68:68/udp
+      - 784:784/udp
+      - 80:80/tcp
+      - 853:853/tcp
+    restart: unless-stopped
+    volumes:
+      - /home/devdaniel/adguard-2/conf:/opt/adguardhome/conf
+      - /home/devdaniel/adguard-2/work:/opt/adguardhome/work
+
+  filebrowser:
+    container_name: filebrowser
+    image: filebrowser/filebrowser
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Amsterdam
+    ports:
+      - 8010:80
+    volumes:
+      - /home/devdaniel/filebrowser/database:/database/
+      - /home/devdaniel/filebrowser/settings:/config/
+
+  netdata:
+    container_name: netdata
+    image: netdata/netdata:edge
+    pid: host
+    
+    network_mode: host
+    restart: unless-stopped
+    cap_add:
+      - SYS_PTRACE
+      - SYS_ADMIN
+    security_opt:
+      - apparmor:unconfined
+    volumes:
+      - /home/devdaniel/netdata/netdatacache:/var/cache/netdata
+      - /home/devdaniel/netdata/netdataconfig:/etc/netdata
+      - /home/devdaniel/netdata/netdatalib:/var/lib/netdata
+
+  nginx-proxy-manager:
+    container_name: nginx-proxy-manager
+    image: jc21/nginx-proxy-manager:latest
+    ports:
+      - 1443:443/tcp
+      - 180:80/tcp
+      - 181:81/tcp
+    restart: unless-stopped
+    volumes:
+      - /home/devdaniel/nginx-proxy-manager/data:/data
+      - /home/devdaniel/nginx-proxy-manager/letsencrypt:/etc/letsencrypt
+
+  wud:
+    container_name: wud
+    image: fmartinou/whats-up-docker
+    ports:
+      - 3001:3000
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
