@@ -1,0 +1,13 @@
+services:
+  homeassistant:
+    container_name: homeassistant
+    image: lscr.io/linuxserver/homeassistant:latest
+    environment:
+      - TZ=Europe/Amsterdam
+      - PUID=1000
+      - PGID=1000
+    ports:
+      - 8123:8123/tcp
+    restart: unless-stopped
+    volumes:
+      - /home/devdaniel/homeassistant/config:/config
