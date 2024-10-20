@@ -35,7 +35,6 @@ services:
     container_name: netdata
     image: netdata/netdata:edge
     pid: host
-    
     network_mode: host
     restart: unless-stopped
     cap_add:
