@@ -1,64 +1,103 @@
 services:
-  adguardhome:
-    container_name: adguardhome
-    image: adguard/adguardhome
+#  adguardhome:
+#    container_name: adguardhome
+#    image: adguard/adguardhome
+#    ports:
+#      - 3000:3000/tcp
+#      - 1443:443/tcp
+#      - 53:53/tcp
+#      - 53:53/udp
+#      - 67:67/udp
+#      - 68:68/tcp
+#      - 68:68/udp
+#      - 784:784/udp
+#      - 180:80/tcp
+#      - 853:853/tcp
+#    restart: unless-stopped
+#    volumes:
+#      - /home/devdaniel/adguard/conf:/opt/adguardhome/conf
+#      - /home/devdaniel/adguard/work:/opt/adguardhome/work
+
+  pihole:
+    container_name: pihole
+    image: pihole/pihole:latest
     ports:
-      - 3000:3000/tcp
-      - 443:443/tcp
       - 53:53/tcp
       - 53:53/udp
-      - 67:67/udp
-      - 68:68/tcp
-      - 68:68/udp
-      - 784:784/udp
-      - 80:80/tcp
-      - 853:853/tcp
-    restart: unless-stopped
-    volumes:
-      - /home/devdaniel/adguard-2/conf:/opt/adguardhome/conf
-      - /home/devdaniel/adguard-2/work:/opt/adguardhome/work
-
-  filebrowser:
-    container_name: filebrowser
-    image: filebrowser/filebrowser
+     # - "67:67/udp" # Only required if you are using Pi-hole as your DHCP server
+      - 180:80/tcp
     environment:
-      - PUID=1000
-      - PGID=1000
       - TZ=Europe/Amsterdam
-    ports:
-      - 8010:80
+      - WEBPASSWORD=*insert secret*
     volumes:
-      - /home/devdaniel/filebrowser/database:/database/
-      - /home/devdaniel/filebrowser/settings:/config/
-
-  netdata:
-    container_name: netdata
-    image: netdata/netdata:edge
-    pid: host
-    network_mode: host
+      - /home/devdaniel/pihole/etc-pihole:/etc/pihole
+      - /home/devdaniel/pihole/etc-dnsmasq.d:/etc/dnsmasq.d
+    #cap_add:
+     # - NET_ADMIN # Required if you are using Pi-hole as your DHCP server, else not needed
     restart: unless-stopped
-    cap_add:
-      - SYS_PTRACE
-      - SYS_ADMIN
-    security_opt:
-      - apparmor:unconfined
-    volumes:
-      - /home/devdaniel/netdata/netdatacache:/var/cache/netdata
-      - /home/devdaniel/netdata/netdataconfig:/etc/netdata
-      - /home/devdaniel/netdata/netdatalib:/var/lib/netdata
+
+#  filebrowser:
+#    container_name: filebrowser
+#    image: filebrowser/filebrowser
+#    environment:
+#      - PUID=1000
+#      - PGID=1000
+#      - TZ=Europe/Amsterdam
+#    ports:
+#      - 8010:80
+ #   volumes:
+#      - /home/devdaniel/filebrowser/database:/database/
+#      - /home/devdaniel/filebrowser/settings:/config/
+
+#  netdata:
+#    container_name: netdata
+#    image: netdata/netdata:edge
+ #   pid: host  
+#    network_mode: host
+#    restart: unless-stopped
+#    cap_add:
+#      - SYS_PTRACE
+#      - SYS_ADMIN
+#    security_opt:
+#      - apparmor:unconfined
+ #   volumes:
+ #     - /home/devdaniel/netdata/netdatacache:/var/cache/netdata
+ #     - /home/devdaniel/netdata/netdataconfig:/etc/netdata
+ #     - /home/devdaniel/netdata/netdatalib:/var/lib/netdata
 
   nginx-proxy-manager:
     container_name: nginx-proxy-manager
     image: jc21/nginx-proxy-manager:latest
     ports:
-      - 1443:443/tcp
-      - 180:80/tcp
-      - 181:81/tcp
+      - 443:443/tcp
+      - 80:80/tcp
+      - 81:81/tcp
     restart: unless-stopped
+    environment:
+      DB_MYSQL_HOST: db
+      DB_MYSQL_PORT: 3306
+      DB_MYSQL_USER: npm
+      DB_MYSQL_PASSWORD: npm
+      DB_MYSQL_NAME: npm
     volumes:
       - /home/devdaniel/nginx-proxy-manager/data:/data
       - /home/devdaniel/nginx-proxy-manager/letsencrypt:/etc/letsencrypt
+    depends_on:
+      - db
 
+  db:
+    image: jc21/mariadb-aria:latest
+    container_name: mariadb-nginx
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: npm
+      MYSQL_DATABASE: npm
+      MYSQL_USER: npm
+      MYSQL_PASSWORD: npm
+      MARIADB_AUTO_UPGRADE: 1
+    volumes:
+      - /home/devdaniel/mariadb/mysql:/var/lib/mysql
+  
   wud:
     container_name: wud
     image: fmartinou/whats-up-docker
@@ -66,3 +105,11 @@ services:
       - 3001:3000
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+   #   - /var/lib/services/whatsupdocker/store:/store 
+    environment:
+      - WUD_WATCHER_LOCAL_CRON=0 1 * * *
+      - WUD_TRIGGER_MQTT_LOCAL_URL=mqtt://10.0.0.10:1883
+      - WUD_TRIGGER_MQTT_LOCAL_HASS_ENABLED=true
+    labels:
+      - 'wud.tag.include=^([0-9]\d*)\.([0-9]\d*)\.([0-9]\d*)$$'
+    restart: unless-stopped
