@@ -9,7 +9,7 @@ services:
       - CONNECT=Netherlands
       - TECHNOLOGY=NordLynx
       - NETWORK=10.0.0.0/24
-      - TOKEN=*insert NORDVPN token*
+      - TOKEN=${NORDVPN_TOKEN}
     sysctls:
       - net.ipv6.conf.all.disable_ipv6=1  # Recomended if using ipv4 only
     ports:
