@@ -28,7 +28,7 @@ services:
       - 180:80/tcp
     environment:
       - TZ=Europe/Amsterdam
-      - WEBPASSWORD=*insert secret*
+      - WEBPASSWORD=${PIHOLE_PASSWORD}
     volumes:
       - /home/devdaniel/pihole/etc-pihole:/etc/pihole
       - /home/devdaniel/pihole/etc-dnsmasq.d:/etc/dnsmasq.d
@@ -76,9 +76,9 @@ services:
     environment:
       DB_MYSQL_HOST: db
       DB_MYSQL_PORT: 3306
-      DB_MYSQL_USER: npm
-      DB_MYSQL_PASSWORD: npm
-      DB_MYSQL_NAME: npm
+      DB_MYSQL_USER: ${MYSQL_USER}
+      DB_MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      DB_MYSQL_NAME: ${MYSQL_NAME}
     volumes:
       - /home/devdaniel/nginx-proxy-manager/data:/data
       - /home/devdaniel/nginx-proxy-manager/letsencrypt:/etc/letsencrypt
@@ -90,10 +90,10 @@ services:
     container_name: mariadb-nginx
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: npm
-      MYSQL_DATABASE: npm
-      MYSQL_USER: npm
-      MYSQL_PASSWORD: npm
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_NAME}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       MARIADB_AUTO_UPGRADE: 1
     volumes:
       - /home/devdaniel/mariadb/mysql:/var/lib/mysql
