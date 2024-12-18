@@ -1,7 +1,7 @@
 services:
   homeassistant:
     container_name: homeassistant
-    image: lscr.io/linuxserver/homeassistant:latest
+    image: linuxserver/homeassistant:latest
     environment:
       - TZ=Europe/Amsterdam
       - PUID=1000
@@ -11,3 +11,70 @@ services:
     restart: unless-stopped
     volumes:
       - /home/devdaniel/homeassistant/config:/config
+
+  mosquitto:
+    image: eclipse-mosquitto
+    container_name: mosquitto
+    volumes:
+      - /home/devdaniel/mosquitto:/mosquitto
+      - /home/devdaniel/mosquitto/data:/mosquitto/data
+      - /home/devdaniel/mosquitto/log:/mosquitto/log
+    ports:
+      - 1883:1883
+    restart: unless-stopped
+
+  zigbee2mqtt:
+    image: koenkk/zigbee2mqtt
+    container_name: zigbee2mqtt
+    restart: unless-stopped
+    devices:
+      - /dev/serial/by-id/usb-ITead_Sonoff_Zigbee_3.0_USB_Dongle_Plus_3a97e06bec82ee118d41429ec33d7414-if00-port0:/dev/ttyACM0
+    ports:
+      - 8888:8080
+    volumes:
+      - /home/devdaniel/zigbee2mqtt/data:/app/data
+      - /run/udev:/run/udev:ro
+    environment:
+      - TZ=Europe/Amsterdam
+      
+  glances:
+    image: nicolargo/glances
+    container_name: glances
+    restart: unless-stopped
+    ports: 
+      - 61208:61208
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /:/host:ro
+    environment:
+      - GLANCES_OPT=-w
+
+  # speech-to-text
+  faster-whisper:
+    image: linuxserver/faster-whisper:latest
+    container_name: faster-whisper
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Amsterdam
+      - WHISPER_MODEL=tiny-int8
+    volumes:
+      - /home/devdaniel/faster-whisper/data:/config
+    ports:
+      - 10300:10300
+    restart: unless-stopped
+
+  # text-to-speech
+  piper:
+    image: linuxserver/piper:latest
+    container_name: piper
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Amsterdam
+      - PIPER_VOICE=en_GB-semaine-medium
+    volumes:
+      - /home/devdaniel/piper/data:/config
+    ports:
+      - 10200:10200
+    restart: unless-stopped
