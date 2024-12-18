@@ -1,7 +1,7 @@
 services:
   emby:
     container_name: emby
-    image: lscr.io/linuxserver/emby:latest
+    image: linuxserver/emby:latest
     environment:
       - TZ=Europe/Amsterdam
       - PUID=1000
@@ -11,20 +11,20 @@ services:
     restart: unless-stopped
     volumes:
       - /home/devdaniel/emby/config:/config
-      - /mnt/seagate2tb/Movies:/data/movies
-      - /mnt/seagate2tb/Series:/data/tvshows
+      - /mnt/nas_movies:/data/movies
+      - /mnt/nas_series:/data/tvshows
 
-  jellyfin:
-    container_name: jellyfin-server
-    image: lscr.io/linuxserver/jellyfin:latest
-    environment:
-      - TZ=Europe/Amsterdam
-      - PUID=1000
-      - PGID=1000
-    ports:
-      - 8096:8096
-    restart: unless-stopped
-    volumes:
-      - /home/devdaniel/jelly/config:/config
-      - /mnt/seagate2tb/Movies:/data/movies
-      - /mnt/seagate2tb/Series:/data/series
+#  jellyfin:
+#    container_name: jellyfin-server
+#    image: linuxserver/jellyfin:latest
+#    environment:
+#      - TZ=Europe/Amsterdam
+#      - PUID=1000
+#      - PGID=1000
+#    ports:
+#      - 8096:8096
+#    restart: unless-stopped
+#    volumes:
+#      - /home/devdaniel/jelly/config:/config
+#      - /mnt/seagate2tb/Movies:/data/movies
+#      - /mnt/seagate2tb/Series:/data/series
