@@ -9,7 +9,7 @@ services:
       - CONNECT=Netherlands
       - TECHNOLOGY=NordLynx
       - NETWORK=10.0.0.0/24
-      - TOKEN=*insert nordvpn token*
+      - TOKEN=*insert NORDVPN token*
     sysctls:
       - net.ipv6.conf.all.disable_ipv6=1  # Recomended if using ipv4 only
     ports:
@@ -23,7 +23,7 @@ services:
 
   prowlarr:
     container_name: prowlarr
-    image: lscr.io/linuxserver/prowlarr:latest
+    image: linuxserver/prowlarr:latest
     network_mode: service:nordvpn
     environment:
       - PUID=1000
@@ -38,7 +38,7 @@ services:
 
   flaresolverr:
     container_name: flaresolverr
-    image: ghcr.io/flaresolverr/flaresolverr:latest
+    image: flaresolverr/flaresolverr:latest
     network_mode: service:nordvpn
     environment:
       - TZ=Europe/Amsterdam
@@ -60,13 +60,13 @@ services:
     restart: always
     volumes:
       - /home/devdaniel/qbittorrent/config:/config
-      - /mnt/seagate2tb/downloads:/downloads
+      - /mnt/nas_downloads:/downloads
     depends_on:
       - nordvpn
 
   radarr:
     container_name: radarr
-    image: lscr.io/linuxserver/radarr:latest
+    image: linuxserver/radarr:latest
     network_mode: service:nordvpn
     environment:
       - TZ=Europe/Amsterdam
@@ -76,14 +76,14 @@ services:
     restart: unless-stopped
     volumes:
       - /home/devdaniel/radarr/config:/config
-      - /mnt/seagate2tb/Movies:/movies
-      - /mnt/seagate2tb/downloads:/downloads
+      - /mnt/nas_movies:/movies
+      - /mnt/nas_downloads:/downloads
     depends_on:
       - nordvpn
 
   readarr:
     container_name: readarr
-    image: lscr.io/linuxserver/readarr:develop
+    image: linuxserver/readarr:develop
     network_mode: service:nordvpn
     environment:
       - TZ=Europe/Amsterdam
@@ -93,14 +93,14 @@ services:
     restart: unless-stopped
     volumes:
       - /home/devdaniel/readarr/config:/config
-      - /mnt/seagate2tb/Books:/books
-      - /mnt/seagate2tb/downloads:/downloads
+      - /mnt/nas_books:/books
+      - /mnt/nas_downloads:/downloads
     depends_on:
       - nordvpn
 
   sonarr:
     container_name: sonarr
-    image: lscr.io/linuxserver/sonarr:latest
+    image: linuxserver/sonarr:latest
     network_mode: service:nordvpn
     environment:
       - PGID=1000
@@ -110,7 +110,7 @@ services:
     restart: unless-stopped
     volumes:
       - /home/devdaniel/sonarr/config:/config
-      - /mnt/seagate2tb/Series:/tv
-      - /mnt/seagate2tb/downloads:/downloads
+      - /mnt/nas_series:/tv
+      - /mnt/nas_downloads:/downloads
     depends_on:
       - nordvpn
