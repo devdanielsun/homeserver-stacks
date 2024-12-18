@@ -1,69 +1,69 @@
 services:
-#  adguardhome:
-#    container_name: adguardhome
-#    image: adguard/adguardhome
-#    ports:
-#      - 3000:3000/tcp
-#      - 1443:443/tcp
-#      - 53:53/tcp
-#      - 53:53/udp
-#      - 67:67/udp
-#      - 68:68/tcp
-#      - 68:68/udp
-#      - 784:784/udp
-#      - 180:80/tcp
-#      - 853:853/tcp
-#    restart: unless-stopped
-#    volumes:
-#      - /home/devdaniel/adguard/conf:/opt/adguardhome/conf
-#      - /home/devdaniel/adguard/work:/opt/adguardhome/work
-
-  pihole:
-    container_name: pihole
-    image: pihole/pihole:latest
+  adguardhome:
+    container_name: adguardhome
+    image: adguard/adguardhome
     ports:
-      - 53:53/tcp
-      - 53:53/udp
-     # - "67:67/udp" # Only required if you are using Pi-hole as your DHCP server
-      - 180:80/tcp
-    environment:
-      - TZ=Europe/Amsterdam
-      - WEBPASSWORD=${PIHOLE_PASSWORD}
-    volumes:
-      - /home/devdaniel/pihole/etc-pihole:/etc/pihole
-      - /home/devdaniel/pihole/etc-dnsmasq.d:/etc/dnsmasq.d
-    #cap_add:
-     # - NET_ADMIN # Required if you are using Pi-hole as your DHCP server, else not needed
+      - 3000:3000/tcp # AdGuard Home web admin interface (alternative port, optional)
+      - 1443:443/tcp  # HTTPS web admin interface (recommended if using HTTPS)
+      - 53:53/tcp    # DNS over TCP for resolving DNS queries (required for DNS functionality)
+      - 53:53/udp    # DNS over UDP for resolving DNS queries (primary, required for DNS functionality)
+      # - 67:67/udp     # DHCP server port (optional, only if DHCP server is enabled)
+      # - 68:68/tcp     # DHCP client communication (optional, rarely used)
+      # - 68:68/udp     # DHCP client communication (optional, only if DHCP server is enabled)
+      - 784:784/udp   # DNS over HTTPS (DoH) queries (optional, only if DoH is configured)
+      - 181:80/tcp    # HTTP web admin interface (optional, if HTTPS is preferred)
+      - 853:853/tcp   # DNS over TLS (DoT) queries (optional, only if DoT is configured)
     restart: unless-stopped
+    volumes:
+      - /home/devdaniel/adguard/conf:/opt/adguardhome/conf
+      - /home/devdaniel/adguard/work:/opt/adguardhome/work
 
-#  filebrowser:
-#    container_name: filebrowser
-#    image: filebrowser/filebrowser
-#    environment:
-#      - PUID=1000
-#      - PGID=1000
-#      - TZ=Europe/Amsterdam
-#    ports:
-#      - 8010:80
- #   volumes:
-#      - /home/devdaniel/filebrowser/database:/database/
-#      - /home/devdaniel/filebrowser/settings:/config/
+  # pihole:
+  #   container_name: pihole
+  #   image: pihole/pihole:latest
+  #   ports:
+  #     - 53:53/tcp
+  #     - 53:53/udp
+  #    # - "67:67/udp" # Only required if you are using Pi-hole as your DHCP server
+  #     - 180:80/tcp
+  #   environment:
+  #     - TZ=Europe/Amsterdam
+  #     - WEBPASSWORD=${PIHOLE_PASSWORD}
+  #   volumes:
+  #     - /home/devdaniel/pihole/etc-pihole:/etc/pihole
+  #     - /home/devdaniel/pihole/etc-dnsmasq.d:/etc/dnsmasq.d
+  #   #cap_add:
+  #    # - NET_ADMIN # Required if you are using Pi-hole as your DHCP server, else not needed
+  #   restart: unless-stopped
 
-#  netdata:
-#    container_name: netdata
-#    image: netdata/netdata:edge
- #   pid: host  
-#    network_mode: host
-#    restart: unless-stopped
-#    cap_add:
-#      - SYS_PTRACE
-#      - SYS_ADMIN
-#    security_opt:
-#      - apparmor:unconfined
- #   volumes:
- #     - /home/devdaniel/netdata/netdatacache:/var/cache/netdata
- #     - /home/devdaniel/netdata/netdataconfig:/etc/netdata
- #     - /home/devdaniel/netdata/netdatalib:/var/lib/netdata
+ #  filebrowser:
+ #    container_name: filebrowser
+ #    image: filebrowser/filebrowser
+ #    environment:
+ #      - PUID=1000
+ #      - PGID=1000
+ #      - TZ=Europe/Amsterdam
+ #    ports:
+ #      - 8010:80
+ #    volumes:
+ #      - /home/devdaniel/filebrowser/database:/database/
+ #      - /home/devdaniel/filebrowser/settings:/config/
+
+ #  netdata:
+ #    container_name: netdata
+ #    image: netdata/netdata:edge
+ #    pid: host  
+ #    network_mode: host
+ #    restart: unless-stopped
+ #    cap_add:
+ #      - SYS_PTRACE
+ #      - SYS_ADMIN
+ #    security_opt:
+ #      - apparmor:unconfined
+ #    volumes:
+ #      - /home/devdaniel/netdata/netdatacache:/var/cache/netdata
+ #      - /home/devdaniel/netdata/netdataconfig:/etc/netdata
+ #      - /home/devdaniel/netdata/netdatalib:/var/lib/netdata
 
   nginx-proxy-manager:
     container_name: nginx-proxy-manager
